@@ -69,8 +69,8 @@ class Airplane:
 
 class Runway:
 
-	def __init__(self, location, available=False, airplane=None):
-    	self.location = location
+    def __init__(self, location, available=False, airplane=None):
+    	self.location = location  # Index in Runways list of Airport
     	self.available = available
     	self.airplane = airplane
 
