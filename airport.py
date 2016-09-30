@@ -1,13 +1,13 @@
 
 class Airport:
 
-	airport = None
+    airport = None
     
     # singleton
     @staticmethod
     def getAirport():
     	if Airport.airport is None:
-    		Airport.airport = Airport()
+            Airport.airport = Airport()
 
     	return Airport.airport
 
@@ -20,7 +20,7 @@ class Airport:
     	
     def addRunways(self,cnt):
     	for i in cnt:
-    		self.runways.append(Runway(i,False,Airplane(str(i)+str(i))))
+            self.runways.append(Runway(i,False,Airplane(str(i)+str(i))))
 
 class ControlCenter:
 
@@ -29,22 +29,22 @@ class ControlCenter:
         
 	def findRunway(self):
 	    for runway in self.airport.runways 
-		    if runway.available
-		        return runway
+	        if runway.available
+                return runway
 
-		return None
+        return None
     
     def processRequest(self, airplane, reqType):
-    	if reqType == "landing":
-    		runway = self.findRunway()
+        if reqType == "landing":
+            runway = self.findRunway()
             if runway is not None:
-            	airplane.landing(runway)
+                airplane.landing(runway)
             else:
-        	    self.waitingQueue.append(airplane)
+                self.waitingQueue.append(airplane)
         elif reqType == "depart":
-        	runway = airplane.depart()
+            runway = airplane.depart()
             if len(self.waitingQueue)>0:
-            	airplane = self.airport.waitingQueue.pop(0)
+                airplane = self.airport.waitingQueue.pop(0)
                 airplane.land(runway)
         
 class Airplane:
