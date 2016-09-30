@@ -14,7 +14,7 @@ class Airport:
     def __init__(self):
     	self.controlCenter = ControlCenter()
     	self.runways = []
-    	self.occupiedRunways = {}   # flight Number -> Runway Number
+    	self.occupiedRunways = {}   # flight Number -> Runway
         self.emptyRunways = 0
     	self.waitingQueue = []
     	
