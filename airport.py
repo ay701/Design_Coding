@@ -14,6 +14,9 @@ class Airport:
     def __init__(self):
     	self.controlCenter = ControlCenter()
     	self.runways = []
+    	self.occupiedRunways = {}   # flight Number -> Runway Number
+        self.emptyRunways = 0
+    	self.waitingQueue = []
     	
     def addRunways(self,cnt):
     	for i in cnt:
@@ -23,9 +26,6 @@ class ControlCenter:
 
     def __init__(self):
     	self.airport = Airport.getAirport()
-    	self.occupiedRunways = {}   # flight Number -> Runway Number
-        self.emptyRunways = 0
-        self.waitingQueue = []
         
 	def findRunway(self):
 	    for runway in self.airport.runways 
@@ -34,35 +34,38 @@ class ControlCenter:
 
 		return None
     
-    def depart(self, airplane):
-
-        location = self.occupiedRunways[airplane.flight_num]
-    	self.airport.runways[location].leave()
-    	
-    	self.occupiedRunways.pop(airplane.flight_num)
-        airplane.landed = False
-        self.emptyRunways += 1
-
-        if len(self.waitingQueue)>0:
-            self.land(self.waitingQueue.pop(0))
-
-    def land(self, airplane):
-
-        runway = self.findRunway()
-        if runway is not None:
-        	runway.occupy(airplane)
-        	self.occupiedRunways[airplane.flight_num] = runway.location
-        	airplane.landed = True
-            self.emptyRunways -= 1
-        else:
-        	self.waitingQueue.append()
-
+    def processRequest(self, airplane, reqType):
+    	if reqType == "landing":
+    		runway = self.findRunway()
+            if runway is not None:
+            	airplane.landing(runway)
+            else:
+        	    self.waitingQueue.append(airplane)
+        elif reqType == "depart":
+        	runway = airplane.depart()
+            if len(self.waitingQueue)>0:
+            	airplane = self.airport.waitingQueue.pop(0)
+                airplane.land(runway)
+        
 class Airplane:
 
     def __init__(self, flight_num, landed=True):
     	self.airport = Airport.getAirport()
     	self.flight_num = flight_num
     	self.landed = landed
+
+    def landing(self,runway):
+    	runway.occupy(self)
+        self.airport.occupiedRunways[self.flight_num] = runway
+        self.airport.emptyRunways -= 1
+        self.landed = True
+        
+    def depart(self):
+        runway = self.airport.occupiedRunways[self.flight_num]
+        runway.clear()
+        self.airport.occupiedRunways.pop(self.flight_num)
+        self.airport.emptyRunways += 1
+        airplane.landed = False
 
 class Runway:
 
@@ -75,6 +78,6 @@ class Runway:
     	self.airplane = airplane
     	self.available = False
 
-    def leave(self):
+    def clear(self):
     	self.airplane = None
     	self.available = True
